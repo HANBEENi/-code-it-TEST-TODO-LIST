@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --no-lint",
     "start": "next start",
     "lint": "next lint"
   },
@@ -14,7 +14,8 @@
     "next": "^14.2.18",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "styled-components": "^6.1.13"
+    "styled-components": "^6.1.13",
+    "vercel": "^39.0.2"
   },
   "devDependencies": {
     "@types/node": "^20",
