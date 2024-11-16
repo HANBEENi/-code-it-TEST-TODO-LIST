@@ -6,8 +6,10 @@
 
 import DetailPageComponent from "@/components/Pages/DetailPage";
 
-const HomePage = () => {
-  return <DetailPageComponent />;
+const HomePage = ({ params }: { params: { itemId: string } }) => {
+  const { itemId } = params;
+
+  return <DetailPageComponent itemId={itemId} />;
 };
 
 export default HomePage;

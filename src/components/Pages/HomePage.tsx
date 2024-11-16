@@ -13,11 +13,55 @@ import {
 import TodoList_R from "../Reusable/TodoList_R";
 import { media } from "@/styles/mediaQuery";
 import { useEffect, useState } from "react";
+import { GET, PATCH, POST } from "@/api/axios";
 
 const HomePageComponent = () => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
-  const [isTodoNone, setIsTodoNone] = useState<boolean>(true);
-  const [isDoneNone, setIsDoneNone] = useState<boolean>(true);
+
+  const [newTodo, setNewTodo] = useState<string>(""); // 새 할 일 입력 값
+  const [todoList, setTodoList] = useState<any[]>([]);
+  const [doneList, setDoneList] = useState<any[]>([]);
+
+  /** */
+  const getTodoList = async () => {
+    try {
+      const data = await GET(`/items`);
+      const todos = data.filter((item: any) => !item.isCompleted);
+      const dones = data.filter((item: any) => item.isCompleted);
+
+      setTodoList(todos);
+      setDoneList(dones);
+    } catch (err) {
+      console.error("할 일 목록 불러오기 실패: ", err);
+    }
+  };
+
+  /** TODO 등록하기 */
+  const handleAddTodo = async () => {
+    if (!newTodo.trim()) return;
+    try {
+      await POST(`/items`, { name: newTodo });
+      setNewTodo("");
+      getTodoList();
+    } catch (err) {
+      console.error("할 일 추가 실패: ", err);
+    }
+  };
+
+  const handlePatchTodo = async (data: any) => {
+    try {
+      await PATCH(`/items/${data.id}`, {
+        isCompleted: !data.isCompleted,
+      });
+    } catch (err) {
+      console.error("투두 수정 실패: ", err);
+    }
+  };
+
+  useEffect(() => {
+    // 페이지 렌더링 시 할 일 목록 가져오기
+    getTodoList();
+  }, [handlePatchTodo]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -34,9 +78,14 @@ const HomePageComponent = () => {
     <>
       <SearchWrap>
         <Search>
-          <input type="text" placeholder="할 일을 입력해주세요." />
+          <input
+            type="text"
+            placeholder="할 일을 입력해주세요."
+            value={newTodo}
+            onChange={(e) => setNewTodo(e.target.value)}
+          />
         </Search>
-        <AddButton>
+        <AddButton onClick={handleAddTodo}>
           {isMobile ? <AddGrayButtonSVG /> : <AddTextGrayButtonSVG />}
         </AddButton>
       </SearchWrap>
@@ -46,7 +95,7 @@ const HomePageComponent = () => {
             <TodoImageSVG />
           </div>
           <div className="list">
-            {isTodoNone ? (
+            {todoList.length < 1 ? (
               <div className="noneImage">
                 <Character1ImageSVG />
                 <div className="text">
@@ -57,9 +106,14 @@ const HomePageComponent = () => {
               </div>
             ) : (
               <>
-                <TodoList_R />
-                <TodoList_R />
-                <TodoList_R />
+                {todoList?.map((todo: any, idx: number) => (
+                  <TodoList_R
+                    key={idx}
+                    isCompleted={todo.isCompleted}
+                    data={todo}
+                    handlePatchTodo={handlePatchTodo}
+                  />
+                ))}
               </>
             )}
           </div>
@@ -70,7 +124,7 @@ const HomePageComponent = () => {
             <div className="text"></div>
           </div>
           <div className="list">
-            {isDoneNone ? (
+            {doneList.length < 1 ? (
               <div className="noneImage">
                 <Character3ImageSVG />
                 <div className="text">
@@ -81,9 +135,14 @@ const HomePageComponent = () => {
               </div>
             ) : (
               <>
-                <TodoList_R />
-                <TodoList_R />
-                <TodoList_R />
+                {doneList?.map((todo: any, idx: number) => (
+                  <TodoList_R
+                    key={idx}
+                    isCompleted={todo.isCompleted}
+                    data={todo}
+                    handlePatchTodo={handlePatchTodo}
+                  />
+                ))}
               </>
             )}
           </div>
@@ -121,7 +180,12 @@ const Search = styled.div`
 
     outline: none;
     border: none;
+
     background: #f1f5f9;
+
+    color: #0f172a;
+    font-size: 1rem;
+
     &::placeholder {
       color: #64748b;
       font-size: 1rem;

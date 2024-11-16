@@ -1,20 +1,21 @@
 import { styled } from "styled-components";
 import { CheckNoIconSVG, CheckYesIconSVG } from "../../../public/svgs/IconSVG";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-const TodoList_R = () => {
-  const [isDone, setIsDone] = useState<boolean>(false);
+const TodoList_R = ({ isCompleted, data, handlePatchTodo }: any) => {
+  const router = useRouter();
 
   return (
-    <Layout style={{ background: isDone ? "#EDE9FE" : "#fff" }}>
-      <Icon onClick={() => setIsDone(!isDone)}>
-        {isDone ? <CheckYesIconSVG /> : <CheckNoIconSVG />}
+    <Layout style={{ background: isCompleted ? "#EDE9FE" : "#fff" }}>
+      <Icon onClick={() => handlePatchTodo(data)}>
+        {isCompleted ? <CheckYesIconSVG /> : <CheckNoIconSVG />}
       </Icon>
       <div
+        onClick={() => router.push(`/items/${data.id}`)}
         className="text"
-        style={{ textDecoration: isDone ? "line-through" : "unset" }}
+        style={{ textDecoration: isCompleted ? "line-through" : "unset" }}
       >
-        비타민 챙겨먹기
+        {data?.name}
       </div>
     </Layout>
   );
@@ -33,6 +34,15 @@ const Layout = styled.div`
 
   border-radius: 27px;
   border: 2px solid #0f172a;
+
+  & .text {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+
+    cursor: pointer;
+  }
 `;
 
 const Icon = styled.div`
