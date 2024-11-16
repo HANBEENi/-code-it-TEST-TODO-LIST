@@ -11,7 +11,7 @@ export const CheckIconSVG = () => (
       stroke="#0F172A"
       strokeWidth="2"
       strokeLinecap="round"
-      stroke-linejoin="round"
+      strokeLinejoin="round"
     />
   </svg>
 );
@@ -49,7 +49,7 @@ export const CheckYesIconSVG = () => (
       stroke="#FEFCE8"
       strokeWidth="4"
       strokeLinecap="round"
-      stroke-linejoin="round"
+      strokeLinejoin="round"
     />
   </svg>
 );
@@ -86,7 +86,7 @@ export const GaleryIconSVG = () => (
   </svg>
 );
 
-export const plusGrayIconSVG = () => (
+export const PlusGrayIconSVG = () => (
   <svg
     width="24"
     height="24"
@@ -109,7 +109,7 @@ export const plusGrayIconSVG = () => (
   </svg>
 );
 
-export const plusWhiteIconSVG = () => (
+export const PlusWhiteIconSVG = () => (
   <svg
     width="16"
     height="16"
