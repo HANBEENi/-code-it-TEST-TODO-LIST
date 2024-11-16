@@ -3,7 +3,6 @@ import {
   Character1ImageSVG,
   Character3ImageSVG,
   DoneImageSVG,
-  SearchImageSVG,
   TodoImageSVG,
 } from "../../../public/svgs/ImageSVG";
 import {
@@ -15,19 +14,25 @@ import { media } from "@/styles/mediaQuery";
 import { useEffect, useState } from "react";
 import { GET, PATCH, POST } from "@/api/axios";
 
+interface Data {
+  id: string;
+  name: string;
+  isCompleted: boolean;
+  memo: string;
+}
 const HomePageComponent = () => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
   const [newTodo, setNewTodo] = useState<string>(""); // 새 할 일 입력 값
-  const [todoList, setTodoList] = useState<any[]>([]);
-  const [doneList, setDoneList] = useState<any[]>([]);
+  const [todoList, setTodoList] = useState<Data[]>([]);
+  const [doneList, setDoneList] = useState<Data[]>([]);
 
   /** */
   const getTodoList = async () => {
     try {
-      const data = await GET(`/items`);
-      const todos = data.filter((item: any) => !item.isCompleted);
-      const dones = data.filter((item: any) => item.isCompleted);
+      const response = await GET(`/items`);
+      const todos = response.data.filter((item: any) => !item.isCompleted);
+      const dones = response.data.filter((item: any) => item.isCompleted);
 
       setTodoList(todos);
       setDoneList(dones);
@@ -49,7 +54,7 @@ const HomePageComponent = () => {
   };
 
   // todo<->done
-  const handlePatchTodo = async (data: any) => {
+  const handlePatchTodo = async (data: Data) => {
     try {
       await PATCH(`/items/${data.id}`, {
         isCompleted: !data.isCompleted,
@@ -107,7 +112,7 @@ const HomePageComponent = () => {
               </div>
             ) : (
               <>
-                {todoList?.map((todo: any, idx: number) => (
+                {todoList?.map((todo: Data, idx: number) => (
                   <TodoList_R
                     key={idx}
                     isCompleted={todo.isCompleted}
@@ -136,7 +141,7 @@ const HomePageComponent = () => {
               </div>
             ) : (
               <>
-                {doneList?.map((todo: any, idx: number) => (
+                {doneList?.map((todo: Data, idx: number) => (
                   <TodoList_R
                     key={idx}
                     isCompleted={todo.isCompleted}

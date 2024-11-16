@@ -1,21 +1,20 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 axios.defaults.withCredentials = true;
 
 interface AxiosType {
   url: string;
   method: "get" | "post" | "put" | "delete" | "patch";
-  body?: object;
-  params?: object;
+  body?: Record<string, unknown>; // 구체적인 타입으로 변경
+  params?: Record<string, unknown>; // 구체적인 타입으로 변경
 }
 
-interface ResponseType {
-  data?: any;
-}
-
-const tenantId = process.env.NEXT_PUBLIC_TENANT_ID;
-
-const axiosWrap = async ({ url, method, body, params }: AxiosType) => {
+const axiosWrap = async ({
+  url,
+  method,
+  body,
+  params,
+}: AxiosType): Promise<AxiosResponse> => {
   try {
     const config: AxiosRequestConfig = {
       baseURL: "/api",
@@ -25,16 +24,16 @@ const axiosWrap = async ({ url, method, body, params }: AxiosType) => {
       },
     };
 
-    const { data } =
-      (method === "get" && (await axios.get(url, config))) ||
-      (method === "post" && (await axios.post(url, body, config))) ||
-      (method === "put" && (await axios.put(url, body, config))) ||
-      (method === "delete" && (await axios.delete(url, config))) ||
-      (method === "patch" && (await axios.patch(url, body, config))) ||
-      {};
-    return data;
+    // 메서드에 따라 axios 호출
+    if (method === "get") return await axios.get(url, config);
+    if (method === "post") return await axios.post(url, body, config);
+    if (method === "put") return await axios.put(url, body, config);
+    if (method === "delete") return await axios.delete(url, config);
+    if (method === "patch") return await axios.patch(url, body, config);
+
+    throw new Error(`Unsupported method: ${method}`);
   } catch (error) {
-    console.log("API 요청 에러: ", error);
+    console.error("API 요청 에러:", error);
     throw error;
   }
 };

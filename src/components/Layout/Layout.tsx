@@ -5,8 +5,13 @@
 import { styled } from "styled-components";
 import Header from "@/components/Layout/Header";
 import { media } from "@/styles/mediaQuery";
+import { ReactNode } from "react";
 
-const CommonLayout = ({ children }: any) => {
+interface CommonLayoutProps {
+  children: ReactNode; // 자식 요소 타입 정의
+}
+
+const CommonLayout = ({ children }: CommonLayoutProps) => {
   return (
     <Layout>
       <Header />

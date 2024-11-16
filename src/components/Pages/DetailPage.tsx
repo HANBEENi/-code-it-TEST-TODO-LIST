@@ -15,7 +15,7 @@ import {
   UpdateGrayButtonSVG,
 } from "../../../public/svgs/ButtonSVG";
 import { media } from "@/styles/mediaQuery";
-import { DELETE, GET, PATCH, POST } from "@/api/axios";
+import { DELETE, GET, PATCH } from "@/api/axios";
 import { useRouter } from "next/navigation";
 
 interface Data {
@@ -40,8 +40,8 @@ const DetailPageComponent = ({ itemId }: { itemId: string }) => {
   const getTodoData = async () => {
     if (!itemId) return;
     try {
-      const data = await GET(`/items/${itemId}`);
-      setData(data);
+      const response = await GET(`/items/${itemId}`);
+      setData(response.data);
     } catch (err) {
       console.error(err);
     }

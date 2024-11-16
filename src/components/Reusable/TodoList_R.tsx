@@ -2,7 +2,19 @@ import { styled } from "styled-components";
 import { CheckNoIconSVG, CheckYesIconSVG } from "../../../public/svgs/IconSVG";
 import { useRouter } from "next/navigation";
 
-const TodoList_R = ({ isCompleted, data, handlePatchTodo }: any) => {
+interface Props {
+  isCompleted: boolean;
+  data: Data;
+  handlePatchTodo: (data: Data) => void;
+}
+interface Data {
+  id: string;
+  name: string;
+  isCompleted: boolean;
+  memo: string;
+}
+
+const TodoList_R = ({ isCompleted, data, handlePatchTodo }: Props) => {
   const router = useRouter();
 
   return (
