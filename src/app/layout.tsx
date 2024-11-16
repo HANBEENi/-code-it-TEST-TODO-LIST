@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import StyledComponentsRegistry from "@/app/registry";
 import type { Metadata } from "next";
+import CommonLayout from "@/components/Layout/Layout";
 
 export const metadata: Metadata = {
   title: "Todo List",
@@ -23,7 +24,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
+        <StyledComponentsRegistry>
+          <CommonLayout>{children}</CommonLayout>
+        </StyledComponentsRegistry>
       </body>
     </html>
   );
