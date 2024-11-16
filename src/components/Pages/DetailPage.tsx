@@ -1,5 +1,7 @@
 "use client";
-
+/**
+ * 상세페이지 컴포넌트
+ */
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import {
@@ -89,6 +91,7 @@ const DetailPageComponent = ({ itemId }: { itemId: string }) => {
     }
   };
 
+  //페이지로딩 시 데이터 불러오기
   useEffect(() => {
     getTodoData();
   }, [itemId]);

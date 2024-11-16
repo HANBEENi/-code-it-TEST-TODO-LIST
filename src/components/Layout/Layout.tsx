@@ -1,5 +1,7 @@
 "use client";
-
+/**
+ * 공통 레이아웃
+ */
 import { styled } from "styled-components";
 import Header from "@/components/Layout/Header";
 import { media } from "@/styles/mediaQuery";

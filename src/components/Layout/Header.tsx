@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * 헤더 레이아웃
+ */
+
 import { media } from "@/styles/mediaQuery";
 import { styled } from "styled-components";
 import { LogoImageSVG } from "../../../public/svgs/ImageSVG";
