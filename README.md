@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Todo List 프로젝트
 
-## Getting Started
+할 일을 관리할 수 있는 간단한 웹 애플리케이션입니다. 새로운 할 일을 추가하고, 수정하거나 삭제할 수 있으며, 메모 및 이미지를 첨부할 수 있습니다.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 주요 기능
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **할 일 관리**: 할 일을 추가, 수정, 삭제할 수 있습니다.
+- **진행 상태**: 할 일의 완료 여부를 체크할 수 있습니다.
+- **메모 작성**: 할 일에 메모를 추가할 수 있습니다.
+- **이미지 업로드**: 할 일에 이미지를 첨부할 수 있습니다.
+  - 이미지 파일명은 영어로만 작성되어야 하며, 크기는 5MB 이하여야 합니다.
+- **반응형 디자인**: 모바일, 태블릿, 데스크톱 환경에 최적화된 UI 제공.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 사용 기술
 
-## Learn More
+- **프론트엔드**: Next.js, TypeScript, Styled-components
+- **API 요청**: Axios
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 설치 및 실행 방법
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 사전 준비
 
-## Deploy on Vercel
+- Node.js 설치
+- npm 설치
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 설치 및 실행
+- npm i
+- 환경 변수 설정(.env)
+  - NEXT_PUBLIC_TENANT_ID=been-iruda
+  - NEXT_PUBLIC_API_URL=https://assignment-todolist-api.vercel.app/api
+- 개발 서버 실행
+  npm run dev
