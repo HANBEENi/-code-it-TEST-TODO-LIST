@@ -15,7 +15,7 @@ import {
   UpdateGrayButtonSVG,
 } from "../../../public/svgs/ButtonSVG";
 import { media } from "@/styles/mediaQuery";
-import { DELETE, GET, PATCH } from "@/api/axios";
+import { DELETE, GET, PATCH, POST } from "@/api/axios";
 import { useRouter } from "next/navigation";
 
 interface Data {
@@ -23,7 +23,7 @@ interface Data {
   name: string;
   isCompleted: boolean;
   memo?: string;
-  imageUrl?: string;
+  imageUrl?: any;
 }
 
 const DetailPageComponent = ({ itemId }: { itemId: string }) => {
@@ -33,6 +33,7 @@ const DetailPageComponent = ({ itemId }: { itemId: string }) => {
   const [isNameEdit, setIsNameEdit] = useState<boolean>(false);
   const [memoEdit, setMemoEdit] = useState<string>("");
   const [nameEdit, setNameEdit] = useState<string>("");
+  const [isCompletedEdit, setIsCompletedEdit] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -41,7 +42,12 @@ const DetailPageComponent = ({ itemId }: { itemId: string }) => {
     if (!itemId) return;
     try {
       const response = await GET(`/items/${itemId}`);
+      const data = response.data;
       setData(response.data);
+      setIsCompletedEdit(data.isCompleted);
+      setSelectedImage(data.imageUrl);
+      setMemoEdit(data.memo);
+      setNameEdit(data.name);
     } catch (err) {
       console.error(err);
     }
@@ -50,13 +56,35 @@ const DetailPageComponent = ({ itemId }: { itemId: string }) => {
   // 메모 수정
   const handlePatchTodo = async () => {
     try {
-      await PATCH(`/items/${itemId}`, {
-        memo: memoEdit,
-      });
-      alert("수정 완료 되었습니다.");
-      if (selectedImage) {
-        // await handleImagePost();
+      // 변경된 값만 추출하여 payload 구성
+      const payload: Record<string, any> = {};
+
+      if (memoEdit !== data?.memo) {
+        payload.memo = memoEdit;
       }
+
+      if (nameEdit !== data?.name) {
+        payload.name = nameEdit;
+      }
+
+      if (selectedImage !== data?.imageUrl) {
+        payload.imageUrl = selectedImage;
+      }
+
+      if (isCompletedEdit !== data?.isCompleted) {
+        payload.isCompleted = isCompletedEdit;
+      }
+
+      // 변경된 값이 없으면 PATCH 요청을 보내지 않음
+      if (Object.keys(payload).length === 0) {
+        alert("변경된 내용이 없습니다.");
+        return;
+      }
+
+      // PATCH 요청
+      await PATCH(`/items/${itemId}`, payload);
+      alert("수정 완료 되었습니다.");
+      router.push("/");
     } catch (err) {
       console.error("투두 수정 실패: ", err);
     }
@@ -74,7 +102,7 @@ const DetailPageComponent = ({ itemId }: { itemId: string }) => {
   };
 
   // 이미지 업로드
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       // 파일 유효성 검사
@@ -87,7 +115,23 @@ const DetailPageComponent = ({ itemId }: { itemId: string }) => {
         return;
       }
 
-      setSelectedImage(file); // 유효한 파일 저장
+      // 이미지 업로드 처리
+      const formData = new FormData();
+      formData.append("image", file);
+
+      try {
+        const response = await POST(`/images/upload`, formData);
+
+        // 서버에서 반환된 URL
+        const imageUrl = response.data.url;
+        console.log("업로드된 이미지 URL: ", imageUrl);
+
+        // URL을 상태에 저장
+        setSelectedImage(imageUrl); // 유효한 파일 저장
+      } catch (error) {
+        console.error("이미지 업로드 실패: ", error);
+        alert("이미지 업로드에 실패했습니다.");
+      }
     }
   };
 
@@ -99,10 +143,18 @@ const DetailPageComponent = ({ itemId }: { itemId: string }) => {
   return (
     <>
       <Title
-        style={{ background: data?.isCompleted ? "#EDE9FE" : "#fff" }}
+        style={{ background: isCompletedEdit ? "#EDE9FE" : "#fff" }}
         onClick={() => setIsNameEdit(true)}
       >
-        {data?.isCompleted ? <CheckYesIconSVG /> : <CheckNoIconSVG />}
+        {isCompletedEdit ? (
+          <div onClick={() => setIsCompletedEdit(!isCompletedEdit)}>
+            <CheckYesIconSVG />
+          </div>
+        ) : (
+          <div onClick={() => setIsCompletedEdit(!isCompletedEdit)}>
+            <CheckNoIconSVG />
+          </div>
+        )}
         {isNameEdit ? (
           <input
             placeholder={data?.name}
@@ -116,12 +168,14 @@ const DetailPageComponent = ({ itemId }: { itemId: string }) => {
       <Contents>
         <PhotoAdd
           style={{
-            backgroundImage: selectedImage
-              ? `url(${URL.createObjectURL(selectedImage)})`
+            backgroundImage: data?.imageUrl
+              ? `url(${data?.imageUrl})`
+              : selectedImage
+              ? `url(${selectedImage})`
               : undefined,
           }}
         >
-          <GaleryIconSVG />
+          {selectedImage ? "" : <GaleryIconSVG />}
           <AddButton>
             <input
               type="file"
@@ -140,8 +194,8 @@ const DetailPageComponent = ({ itemId }: { itemId: string }) => {
           {isMemoEdit ? (
             <textarea
               className="content"
-              placeholder=""
-              value={data?.memo}
+              placeholder="메모를 입력해주세요."
+              value={memoEdit ?? data?.memo}
               onChange={(e) => setMemoEdit(e.target.value)}
             >
               {data?.memo}

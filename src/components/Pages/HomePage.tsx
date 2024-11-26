@@ -22,13 +22,16 @@ interface Data {
 }
 const HomePageComponent = () => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [newTodo, setNewTodo] = useState<string>(""); // 새 할 일 입력 값
   const [todoList, setTodoList] = useState<Data[]>([]);
   const [doneList, setDoneList] = useState<Data[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  /** */
+  /* TODO 불러오기 */
   const getTodoList = async () => {
+    setIsLoading(true); // 로딩 시작
     try {
       const response = await GET(`/items`);
       const todos = response.data.filter((item: any) => !item.isCompleted);
@@ -38,36 +41,70 @@ const HomePageComponent = () => {
       setDoneList(dones);
     } catch (err) {
       console.error("할 일 목록 불러오기 실패: ", err);
+    } finally {
+      setIsLoading(false); // 로딩 종료
     }
   };
 
   /** TODO 등록하기 */
   const handleAddTodo = async () => {
-    if (!newTodo.trim()) return;
+    if (isSubmitting || !newTodo.trim()) return;
+    setIsSubmitting(true);
+
     try {
       await POST(`/items`, { name: newTodo });
       setNewTodo("");
       getTodoList();
     } catch (err) {
       console.error("할 일 추가 실패: ", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   // todo<->done
   const handlePatchTodo = async (data: Data) => {
+    // 백업 상태 저장
+    const prevTodoList = [...todoList];
+    const prevDoneList = [...doneList];
+
     try {
+      // 1. 로컬 상태 먼저 업데이트
+      if (data.isCompleted) {
+        // todo -> done
+        setDoneList((prev) => prev.filter((item) => item.id !== data.id));
+        setTodoList((prev) => [...prev, { ...data, isCompleted: false }]);
+      } else {
+        // done -> todo
+        setTodoList((prev) => prev.filter((item) => item.id !== data.id));
+        setDoneList((prev) => [...prev, { ...data, isCompleted: true }]);
+      }
+      // 2. 서버에 변경 요청
       await PATCH(`/items/${data.id}`, {
         isCompleted: !data.isCompleted,
       });
     } catch (err) {
       console.error("투두 수정 실패: ", err);
+      alert("상태 변경 실패");
+
+      // 요청 실패 시 이전 상태로 롤백
+      setTodoList(prevTodoList);
+      setDoneList(prevDoneList);
+    }
+  };
+
+  // enter 이벤트 - 할일추가
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddTodo();
     }
   };
 
   useEffect(() => {
     // 페이지 렌더링 시 할 일 목록 가져오기
     getTodoList();
-  }, [handlePatchTodo]);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -89,6 +126,7 @@ const HomePageComponent = () => {
             placeholder="할 일을 입력해주세요."
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
         </Search>
         <AddButton onClick={handleAddTodo}>

@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 
 interface AxiosType {
   url: string;
@@ -17,12 +17,21 @@ const axiosWrap = async ({
 }: AxiosType): Promise<AxiosResponse> => {
   try {
     const config: AxiosRequestConfig = {
-      baseURL: "/api",
+      baseURL: `${process.env.NEXT_PUBLIC_API_URL}/${process.env.NEXT_PUBLIC_TENANT_ID}`,
       params,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: {},
     };
+
+    // Content-Type 동적 처리
+    if (method === "post" || method === "patch") {
+      const isFormData = body instanceof FormData;
+      if (isFormData) {
+        // Content-Type을 설정하지 않음 (axios가 자동 처리)
+        delete config.headers!["Content-Type"];
+      } else {
+        config.headers!["Content-Type"] = "application/json";
+      }
+    }
 
     // 메서드에 따라 axios 호출
     if (method === "get") return await axios.get(url, config);
