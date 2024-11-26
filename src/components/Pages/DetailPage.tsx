@@ -168,9 +168,7 @@ const DetailPageComponent = ({ itemId }: { itemId: string }) => {
       <Contents>
         <PhotoAdd
           style={{
-            backgroundImage: data?.imageUrl
-              ? `url(${data?.imageUrl})`
-              : selectedImage
+            backgroundImage: selectedImage
               ? `url(${selectedImage})`
               : undefined,
           }}
